@@ -18,7 +18,8 @@ const Routes = () => {
           <Cart />
         </Route>
       </Switch>
-    </BrowserRouter>);
+    </BrowserRouter>
+  );
 };
 
 export default Routes;

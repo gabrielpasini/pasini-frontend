@@ -17,7 +17,7 @@ import {
   ListItemIcon,
   ListItemText,
   Hidden,
-  Tooltip
+  Tooltip,
 } from '@material-ui/core';
 import {
   Menu,
@@ -25,7 +25,7 @@ import {
   ChevronRight,
   ShoppingCart,
   Store,
-  GitHub
+  GitHub,
 } from '@material-ui/icons';
 import Routes from './routes';
 
@@ -161,39 +161,41 @@ const BaseDrawer = () => {
               </Typography>
             </a>
           </Hidden>
-          { window.location.pathname !== '/carrinho' ? (
-          <div className={classes.btnCart}>
-            <Hidden xsDown>
-              <Button
-                size="large"
-                variant="contained"
-                color="secondary"
-                href="/carrinho"
-                endIcon={
-                  <StyledBadge badgeContent={cart.length} color="error">
-                    <ShoppingCart />
-                  </StyledBadge>
-                }
-              >
-                Carrinho
-              </Button>
-            </Hidden>
-            <Hidden only={['lg', 'md', 'sm', 'xl']}>
-              <Tooltip title="Carrinho">
+          {window.location.pathname !== '/carrinho' ? (
+            <div className={classes.btnCart}>
+              <Hidden xsDown>
                 <Button
                   size="large"
                   variant="contained"
                   color="secondary"
                   href="/carrinho"
+                  endIcon={
+                    <StyledBadge badgeContent={cart.length} color="error">
+                      <ShoppingCart />
+                    </StyledBadge>
+                  }
                 >
-                  <StyledBadge badgeContent={cart.length} color="error">
-                    <ShoppingCart />
-                  </StyledBadge>
+                  Carrinho
                 </Button>
-              </Tooltip>
-            </Hidden>
-          </div>
-          ) : ('')}
+              </Hidden>
+              <Hidden only={['lg', 'md', 'sm', 'xl']}>
+                <Tooltip title="Carrinho">
+                  <Button
+                    size="large"
+                    variant="contained"
+                    color="secondary"
+                    href="/carrinho"
+                  >
+                    <StyledBadge badgeContent={cart.length} color="error">
+                      <ShoppingCart />
+                    </StyledBadge>
+                  </Button>
+                </Tooltip>
+              </Hidden>
+            </div>
+          ) : (
+            ''
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -217,7 +219,9 @@ const BaseDrawer = () => {
         <Divider />
         <List>
           <ListItem button component="a" href="/">
-            <ListItemIcon><Store /></ListItemIcon>
+            <ListItemIcon>
+              <Store />
+            </ListItemIcon>
             <ListItemText primary="Produtos" />
           </ListItem>
           <ListItem button component="a" href="/carrinho">
@@ -227,7 +231,12 @@ const BaseDrawer = () => {
             <ListItemText primary="Carrinho" />
           </ListItem>
           <Divider />
-          <ListItem button component="a" href="https://github.com/gabrielpasini" target="_blank">
+          <ListItem
+            button
+            component="a"
+            href="https://github.com/gabrielpasini"
+            target="_blank"
+          >
             <ListItemIcon>
               <GitHub />
             </ListItemIcon>
@@ -240,6 +249,6 @@ const BaseDrawer = () => {
       </main>
     </div>
   );
-}
+};
 
 export default BaseDrawer;

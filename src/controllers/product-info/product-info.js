@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Axios from '../../config/config-axios';
 import { makeStyles } from '@material-ui/core/styles';
-import Carousel from 'react-material-ui-carousel'
+import Carousel from 'react-material-ui-carousel';
 import {
   Button,
   Divider,
@@ -71,18 +71,17 @@ const ProductInfo = () => {
     }
     const cartRes = await Axios.get('cart');
     setCart(cartRes.data[0].items);
-  }
+  };
 
   useEffect(() => {
     setShowBlockUi(true);
-    getData()
-      .then(() => setShowBlockUi(false));
+    getData().then(() => setShowBlockUi(false));
   }, []);
 
-  const updateCart = async id => {
+  const updateCart = async (id) => {
     setShowBlockUi(true);
     let newCart = [];
-    const idExists = cart.find(i => i === id);
+    const idExists = cart.find((i) => i === id);
     if (idExists) {
       setShowBlockUi(false);
       setShowToaster(true);
@@ -91,10 +90,10 @@ const ProductInfo = () => {
       newCart = [...cart, id];
     }
     await Axios.post('cart', {
-      items: newCart
+      items: newCart,
     }).then(() => setShowBlockUi(false));
-    history.push("/carrinho");
-  }
+    history.push('/carrinho');
+  };
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -103,9 +102,9 @@ const ProductInfo = () => {
     setShowToaster(false);
   };
 
-  const textEllipsis = text => {
+  const textEllipsis = (text) => {
     if (text.length >= 240) {
-        const short = text.substr(0, 240);
+      const short = text.substr(0, 240);
       return (
         <>
           {`${short}...`}
@@ -123,7 +122,7 @@ const ProductInfo = () => {
     } else {
       return text;
     }
-  }
+  };
 
   return (
     <>
@@ -132,7 +131,11 @@ const ProductInfo = () => {
         <Backdrop className={classes.backdrop} open={showBlockUi}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Snackbar open={showToaster} autoHideDuration={5000} onClose={handleClose}>
+        <Snackbar
+          open={showToaster}
+          autoHideDuration={5000}
+          onClose={handleClose}
+        >
           <Toaster onClose={handleClose} severity="warning">
             Este produto já está no carrinho!
           </Toaster>
@@ -148,15 +151,15 @@ const ProductInfo = () => {
             >
               <DialogTitle id="scroll-dialog-title">{product.name}</DialogTitle>
               <DialogContent dividers="paper">
-                <DialogContentText
-                  id="scroll-dialog-description"
-                  tabIndex={-1}
-                >
+                <DialogContentText id="scroll-dialog-description" tabIndex={-1}>
                   {product.description}
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button onClick={() => setShowFullDescription(false)} color="primary">
+                <Button
+                  onClick={() => setShowFullDescription(false)}
+                  color="primary"
+                >
                   Fechar
                 </Button>
               </DialogActions>
@@ -168,52 +171,68 @@ const ProductInfo = () => {
                 autoplay={false}
                 strictIndexing={true}
               >
-                {
-                  [product.profilePath, ...product.imagesPath].map((url, index) => (
+                {[product.profilePath, ...product.imagesPath].map(
+                  (url, index) => (
                     <CardMedia
                       key={index}
                       className={classes.cover}
                       image={url}
                       title={product.name}
                     />
-                  ))
-                }
+                  )
+                )}
               </Carousel>
-                <div className={classes.details}>
-                  <CardContent className={classes.content}>
-                    <Typography component="h5" variant="h4">
-                      {product.name}
-                    </Typography>
-                    <Divider />
-                    <Typography color="textSecondary" className="description-ellipsis">
-                      {textEllipsis(product.description)}
-                    </Typography>
-                    <Divider />
-                    <Typography variant="h4" color="primary">
-                      {`${product.price.currSymbol}${product.price.valueShow}`}
-                    </Typography>
-                  </CardContent>
-                  <div className={classes.controls}>
-                    <Hidden smDown>
-                      <Button size="large" endIcon={<ShoppingCart />} variant="contained" color="secondary" onClick={() => updateCart(product._id)}>
-                        Adicionar ao carrinho
+              <div className={classes.details}>
+                <CardContent className={classes.content}>
+                  <Typography component="h5" variant="h4">
+                    {product.name}
+                  </Typography>
+                  <Divider />
+                  <Typography
+                    color="textSecondary"
+                    className="description-ellipsis"
+                  >
+                    {textEllipsis(product.description)}
+                  </Typography>
+                  <Divider />
+                  <Typography variant="h4" color="primary">
+                    {`${product.price.currSymbol}${product.price.valueShow}`}
+                  </Typography>
+                </CardContent>
+                <div className={classes.controls}>
+                  <Hidden smDown>
+                    <Button
+                      size="large"
+                      endIcon={<ShoppingCart />}
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => updateCart(product._id)}
+                    >
+                      Adicionar ao carrinho
+                    </Button>
+                  </Hidden>
+                  <Hidden only={['md', 'lg', 'xl']}>
+                    <Tooltip title="Adicionar ao carrinho">
+                      <Button
+                        size="large"
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => updateCart(product._id)}
+                      >
+                        <ShoppingCart />
                       </Button>
-                    </Hidden>
-                    <Hidden only={['md', 'lg', 'xl']}>
-                      <Tooltip title="Adicionar ao carrinho">
-                        <Button size="large" variant="contained" color="secondary" onClick={() => updateCart(product._id)}>
-                          <ShoppingCart />
-                        </Button>
-                      </Tooltip>
-                    </Hidden>
-                  </div>
+                    </Tooltip>
+                  </Hidden>
                 </div>
+              </div>
             </Card>
           </>
-        ) : ('')}
+        ) : (
+          ''
+        )}
       </main>
     </>
   );
-}
+};
 
 export default ProductInfo;

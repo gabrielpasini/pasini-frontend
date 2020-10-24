@@ -27,7 +27,7 @@ const darkTheme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={darkTheme}>
-      <CssBaseline/>
+      <CssBaseline />
       <BaseDrawer />
     </ThemeProvider>
   </React.StrictMode>,

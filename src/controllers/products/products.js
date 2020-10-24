@@ -3,7 +3,7 @@ import Axios from '../../config/config-axios';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { ShoppingCart } from '@material-ui/icons';
-import { 
+import {
   Button,
   Card,
   CardActions,
@@ -17,7 +17,7 @@ import {
   Tooltip,
   Snackbar,
   Backdrop,
-  CircularProgress
+  CircularProgress,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 
@@ -68,14 +68,13 @@ const Products = () => {
 
   useEffect(() => {
     setShowBlockUi(true);
-    getData()
-      .then(() => setShowBlockUi(false));
-  }, [])
+    getData().then(() => setShowBlockUi(false));
+  }, []);
 
-  const updateCart = async id => {
+  const updateCart = async (id) => {
     setShowBlockUi(true);
     let newCart = [];
-    const idExists = cart.find(i => i === id);
+    const idExists = cart.find((i) => i === id);
     if (idExists) {
       setShowBlockUi(false);
       setShowToaster(true);
@@ -84,10 +83,10 @@ const Products = () => {
       newCart = [...cart, id];
     }
     await Axios.post('cart', {
-      items: newCart
+      items: newCart,
     }).then(() => setShowBlockUi(false));
-    history.push("/carrinho");
-  }
+    history.push('/carrinho');
+  };
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -103,7 +102,11 @@ const Products = () => {
         <Backdrop className={classes.backdrop} open={showBlockUi}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Snackbar open={showToaster} autoHideDuration={5000} onClose={handleClose}>
+        <Snackbar
+          open={showToaster}
+          autoHideDuration={5000}
+          onClose={handleClose}
+        >
           <Toaster onClose={handleClose} severity="warning">
             Este produto já está no carrinho!
           </Toaster>
@@ -121,25 +124,50 @@ const Products = () => {
                     />
                   </a>
                   <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant="h5" component="h2" color="primary">
-                      <a href={`/info-produto/${product._id}`}>{product.name}</a>
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="h2"
+                      color="primary"
+                    >
+                      <a href={`/info-produto/${product._id}`}>
+                        {product.name}
+                      </a>
                     </Typography>
                     <Typography variant="h6">
                       <b>{`${product.price.currSymbol}${product.price.valueShow}`}</b>
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small" variant="outlined" color="primary" onClick={() => history.push(`/info-produto/${product._id}`)}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                      onClick={() =>
+                        history.push(`/info-produto/${product._id}`)
+                      }
+                    >
                       + Detalhes
                     </Button>
                     <Hidden mdDown>
-                      <Button size="small" endIcon={<ShoppingCart />} variant="contained" color="secondary" onClick={() => updateCart(product._id)}>
+                      <Button
+                        size="small"
+                        endIcon={<ShoppingCart />}
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => updateCart(product._id)}
+                      >
                         Adicionar ao carrinho
                       </Button>
                     </Hidden>
                     <Hidden only={['lg', 'xl']}>
                       <Tooltip title="Adicionar ao carrinho">
-                        <Button size="small" variant="contained" color="secondary" onClick={() => updateCart(product._id)}>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => updateCart(product._id)}
+                        >
                           <ShoppingCart />
                         </Button>
                       </Tooltip>
@@ -153,6 +181,6 @@ const Products = () => {
       </main>
     </>
   );
-}
+};
 
 export default Products;

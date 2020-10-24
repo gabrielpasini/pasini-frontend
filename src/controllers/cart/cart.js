@@ -23,7 +23,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 
@@ -81,38 +81,37 @@ const Cart = () => {
     const productRes = await Axios.get(`products/${JSON.stringify(itemIds)}`);
     setProducts(productRes.data);
     setCart(itemIds);
-  }
+  };
 
   useEffect(() => {
     setShowBlockUi(true);
-    getData()
-      .then(() => setShowBlockUi(false));
+    getData().then(() => setShowBlockUi(false));
   }, []);
 
   const showTotalValue = () => {
-    const total = _.sum(products.map(p => p.price.value));
+    const total = _.sum(products.map((p) => p.price.value));
     let priceShow = '';
-        const priceStr = total.toString();
-        if (priceStr.length > 3) {
-            const cents = priceStr.substr(-2, 2);
-            const money = priceStr.substr(0, priceStr.length -2);
-            priceShow = `${money},${cents}`;
-        } else if (priceStr.length === 2) {
-            priceShow = `0,${priceStr}`;
-        } else {
-            priceShow = `0,0${priceStr}`;
-        }
-      return 'R$' + priceShow;
+    const priceStr = total.toString();
+    if (priceStr.length > 3) {
+      const cents = priceStr.substr(-2, 2);
+      const money = priceStr.substr(0, priceStr.length - 2);
+      priceShow = `${money},${cents}`;
+    } else if (priceStr.length === 2) {
+      priceShow = `0,${priceStr}`;
+    } else {
+      priceShow = `0,0${priceStr}`;
+    }
+    return 'R$' + priceShow;
   };
 
-  const removeFromCart = async id => {
+  const removeFromCart = async (id) => {
     setShowBlockUi(true);
     const newCart = _.filter(cart, (item) => item !== id);
     await Axios.post('cart', {
-      items: newCart
+      items: newCart,
     });
     await getData().then(() => setShowBlockUi(false));
-  }
+  };
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -121,15 +120,15 @@ const Cart = () => {
     setShowToaster(false);
   };
 
-  const showProductDescription = product => {
+  const showProductDescription = (product) => {
     setProductSelected(product);
     setShowFullDescription(true);
-  }
+  };
 
-  const textEllipsis = product => {
+  const textEllipsis = (product) => {
     const text = product.description;
     if (text.length >= 60) {
-        const short = text.substr(0, 60);
+      const short = text.substr(0, 60);
       return (
         <>
           {`${short}...`}
@@ -147,7 +146,7 @@ const Cart = () => {
     } else {
       return text;
     }
-  }
+  };
 
   return (
     <>
@@ -156,7 +155,11 @@ const Cart = () => {
         <Backdrop className={classes.backdrop} open={showBlockUi}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Snackbar open={showToaster} autoHideDuration={5000} onClose={handleClose}>
+        <Snackbar
+          open={showToaster}
+          autoHideDuration={5000}
+          onClose={handleClose}
+        >
           <Toaster onClose={handleClose} severity="info">
             Opção indisponível! Em breve...
           </Toaster>
@@ -169,78 +172,90 @@ const Cart = () => {
             aria-labelledby="scroll-dialog-title"
             aria-describedby="scroll-dialog-description"
           >
-            <DialogTitle id="scroll-dialog-title">{productSelected.name}</DialogTitle>
+            <DialogTitle id="scroll-dialog-title">
+              {productSelected.name}
+            </DialogTitle>
             <DialogContent dividers="paper">
-              <DialogContentText
-                id="scroll-dialog-description"
-                tabIndex={-1}
-              >
+              <DialogContentText id="scroll-dialog-description" tabIndex={-1}>
                 {productSelected.description}
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setShowFullDescription(false)} color="primary">
+              <Button
+                onClick={() => setShowFullDescription(false)}
+                color="primary"
+              >
                 Fechar
               </Button>
             </DialogActions>
           </Dialog>
-        ) : ('')}
+        ) : (
+          ''
+        )}
         <Container className={classes.cardGrid} maxWidth="lg">
           <List className={classes.root}>
-            { products.length ? products.map((product, index) => (
-              <div key={index}>
-                <ListItem alignItems="flex-start">
-                  <ListItemAvatar className={classes.marginAvatar}>
-                    <a href={`/info-produto/${product._id}`}>
-                      <Avatar className={classes.large} alt={`${index}_${product._id}`} src={product.profilePath} />
-                    </a>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={<a href={`/info-produto/${product._id}`}>{product.name}</a>}
-                    secondary={
-                      <>
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          className={classes.inline}
-                          color="textPrimary"
-                        >
-                          {textEllipsis(product)}
-                        </Typography>
-                      </>
-                    }
-                  />
-                  <div className={classes.rightBox}>
+            {products.length ? (
+              products.map((product, index) => (
+                <div key={index}>
+                  <ListItem alignItems="flex-start">
+                    <ListItemAvatar className={classes.marginAvatar}>
+                      <a href={`/info-produto/${product._id}`}>
+                        <Avatar
+                          className={classes.large}
+                          alt={`${index}_${product._id}`}
+                          src={product.profilePath}
+                        />
+                      </a>
+                    </ListItemAvatar>
                     <ListItemText
                       primary={
-                        <Typography
-                          variant="body2"
-                          className={classes.inline}
-                          color="textPrimary"
-                        >
-                          <Tooltip title="Remover do carrinho">
-                            <IconButton
-                              aria-label="delete"
-                              color="secondary"
-                              onClick={() => removeFromCart(product._id)}
-                            >
-                              <Delete fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          {`${product.price.currSymbol}${product.price.valueShow}`}
-                        </Typography>
+                        <a href={`/info-produto/${product._id}`}>
+                          {product.name}
+                        </a>
+                      }
+                      secondary={
+                        <>
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            className={classes.inline}
+                            color="textPrimary"
+                          >
+                            {textEllipsis(product)}
+                          </Typography>
+                        </>
                       }
                     />
-                  </div>
-                </ListItem>
-                <Divider variant="inset" component="li" />
-              </div>
-            )) : (
+                    <div className={classes.rightBox}>
+                      <ListItemText
+                        primary={
+                          <Typography
+                            variant="body2"
+                            className={classes.inline}
+                            color="textPrimary"
+                          >
+                            <Tooltip title="Remover do carrinho">
+                              <IconButton
+                                aria-label="delete"
+                                color="secondary"
+                                onClick={() => removeFromCart(product._id)}
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            {`${product.price.currSymbol}${product.price.valueShow}`}
+                          </Typography>
+                        }
+                      />
+                    </div>
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                </div>
+              ))
+            ) : (
               <>
                 <ListItem>
-                  <ListItemText
-                    primary={`Seu carrinho está vazio...`}
-                  />
+                  <ListItemText primary={`Seu carrinho está vazio...`} />
                 </ListItem>
                 <Divider variant="inset" component="li" />
               </>
@@ -264,13 +279,24 @@ const Cart = () => {
             <ListItem>
               <ListItemText
                 primary={
-                  <Button size="small" variant="contained" color="secondary" href="/">
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="secondary"
+                    href="/"
+                  >
                     Continuar Comprando
                   </Button>
                 }
               />
               <div className={classes.rightBox}>
-                <Button disabled={!cart.length} size="large" variant="contained" color="primary" onClick={() => setShowToaster(true)}>
+                <Button
+                  disabled={!cart.length}
+                  size="large"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setShowToaster(true)}
+                >
                   PAGAR
                 </Button>
               </div>
@@ -280,6 +306,6 @@ const Cart = () => {
       </main>
     </>
   );
-}
+};
 
 export default Cart;
