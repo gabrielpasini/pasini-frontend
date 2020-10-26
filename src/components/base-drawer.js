@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import Axios from '../config/config-axios';
+import Routes from './routes';
+import { useDispatch, useSelector } from 'react-redux';
+import { Creators as CartActions } from '../store/ducks/cart';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import {
   Button,
@@ -27,7 +29,6 @@ import {
   Store,
   GitHub,
 } from '@material-ui/icons';
-import Routes from './routes';
 
 const drawerWidth = 240;
 
@@ -111,18 +112,19 @@ const StyledBadge = withStyles((theme) => ({
 }))(Badge);
 
 const BaseDrawer = () => {
+  const cart = useSelector((state) => state.cart.products);
+  const dispatch = useDispatch();
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [cart, setCart] = useState([]);
 
-  const getData = async () => {
-    const cartRes = await Axios.get('cart');
-    setCart(cartRes.data[0].items);
+  const getInitialData = () => {
+    dispatch(CartActions.getCart());
   };
 
   useEffect(() => {
-    getData();
+    getInitialData();
+    // eslint-disable-next-line
   }, []);
 
   const handleDrawerOpen = () => {
@@ -161,41 +163,37 @@ const BaseDrawer = () => {
               </Typography>
             </a>
           </Hidden>
-          {window.location.pathname !== '/carrinho' ? (
-            <div className={classes.btnCart}>
-              <Hidden xsDown>
+          <div className={classes.btnCart}>
+            <Hidden xsDown>
+              <Button
+                size="large"
+                variant="contained"
+                color="secondary"
+                href="/carrinho"
+                endIcon={
+                  <StyledBadge badgeContent={cart.length} color="error">
+                    <ShoppingCart />
+                  </StyledBadge>
+                }
+              >
+                Carrinho
+              </Button>
+            </Hidden>
+            <Hidden only={['lg', 'md', 'sm', 'xl']}>
+              <Tooltip title="Carrinho">
                 <Button
                   size="large"
                   variant="contained"
                   color="secondary"
                   href="/carrinho"
-                  endIcon={
-                    <StyledBadge badgeContent={cart.length} color="error">
-                      <ShoppingCart />
-                    </StyledBadge>
-                  }
                 >
-                  Carrinho
+                  <StyledBadge badgeContent={cart.length} color="error">
+                    <ShoppingCart />
+                  </StyledBadge>
                 </Button>
-              </Hidden>
-              <Hidden only={['lg', 'md', 'sm', 'xl']}>
-                <Tooltip title="Carrinho">
-                  <Button
-                    size="large"
-                    variant="contained"
-                    color="secondary"
-                    href="/carrinho"
-                  >
-                    <StyledBadge badgeContent={cart.length} color="error">
-                      <ShoppingCart />
-                    </StyledBadge>
-                  </Button>
-                </Tooltip>
-              </Hidden>
-            </div>
-          ) : (
-            ''
-          )}
+              </Tooltip>
+            </Hidden>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer

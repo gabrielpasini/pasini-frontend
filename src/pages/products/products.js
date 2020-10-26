@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import Axios from '../../config/config-axios';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Creators as CartActions } from '../../store/ducks/cart';
+import { Creators as ProductsActions } from '../../store/ducks/products';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { ShoppingCart } from '@material-ui/icons';
@@ -52,68 +54,78 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Products = () => {
+  const cart = useSelector((state) => state.cart);
+  const products = useSelector((state) => state.products);
+  console.log('CART:', cart);
+  console.log('PRODUCTS:', products);
+  const dispatch = useDispatch();
   const classes = useStyles();
   const history = useHistory();
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
-  const [showToaster, setShowToaster] = useState(false);
-  const [showBlockUi, setShowBlockUi] = useState(false);
 
-  const getData = async () => {
-    const productRes = await Axios.get('products');
-    const cartRes = await Axios.get('cart');
-    setProducts(productRes.data);
-    setCart(cartRes.data[0].items);
+  const getInitialData = () => {
+    dispatch(ProductsActions.getProducts());
   };
 
   useEffect(() => {
-    setShowBlockUi(true);
-    getData().then(() => setShowBlockUi(false));
+    getInitialData();
+    // eslint-disable-next-line
   }, []);
 
-  const updateCart = async (id) => {
-    setShowBlockUi(true);
-    let newCart = [];
-    const idExists = cart.find((i) => i === id);
-    if (idExists) {
-      setShowBlockUi(false);
-      setShowToaster(true);
-      return;
-    } else {
-      newCart = [...cart, id];
-    }
-    await Axios.post('cart', {
-      items: newCart,
-    }).then(() => setShowBlockUi(false));
-    history.push('/carrinho');
+  const addToCart = (id) => {
+    dispatch(CartActions.addProduct(id));
   };
 
-  const handleClose = (event, reason) => {
+  const handleCloseError = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    setShowToaster(false);
+    if (cart.error) {
+      dispatch(CartActions.closeMessage());
+    }
+    if (products.error) {
+      dispatch(ProductsActions.closeMessage());
+    }
+  };
+
+  const handleCloseSuccess = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    dispatch(CartActions.closeMessage());
   };
 
   return (
     <>
       <CssBaseline />
       <main>
-        <Backdrop className={classes.backdrop} open={showBlockUi}>
+        <Backdrop className={classes.backdrop} open={cart.loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
         <Snackbar
-          open={showToaster}
+          open={
+            (cart.error && cart.message !== '') ||
+            (products.error && products.message !== '')
+          }
           autoHideDuration={5000}
-          onClose={handleClose}
+          onClose={handleCloseError}
         >
-          <Toaster onClose={handleClose} severity="warning">
-            Este produto já está no carrinho!
+          <Toaster onClose={handleCloseError} severity="warning">
+            {cart.error && cart.message !== '' ? cart.message : ''}
+            {products.error && products.message !== '' ? products.message : ''}
+          </Toaster>
+        </Snackbar>
+        <Snackbar
+          open={!cart.error && cart.message !== ''}
+          autoHideDuration={5000}
+          onClose={handleCloseSuccess}
+        >
+          <Toaster onClose={handleCloseSuccess} severity="success">
+            {!cart.error && cart.message !== '' ? cart.message : ''}
           </Toaster>
         </Snackbar>
         <Container className={classes.cardGrid} maxWidth="lg">
           <Grid container spacing={4}>
-            {products.map((product, index) => (
+            {products.products.map((product, index) => (
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
                   <a href={`/info-produto/${product._id}`}>
@@ -155,7 +167,7 @@ const Products = () => {
                         endIcon={<ShoppingCart />}
                         variant="contained"
                         color="secondary"
-                        onClick={() => updateCart(product._id)}
+                        onClick={() => addToCart(product._id)}
                       >
                         Adicionar ao carrinho
                       </Button>
@@ -166,7 +178,7 @@ const Products = () => {
                           size="small"
                           variant="contained"
                           color="secondary"
-                          onClick={() => updateCart(product._id)}
+                          onClick={() => addToCart(product._id)}
                         >
                           <ShoppingCart />
                         </Button>

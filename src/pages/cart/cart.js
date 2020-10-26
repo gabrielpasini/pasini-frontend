@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
-import Axios from '../../config/config-axios';
+import { Creators as ProductsActions } from '../../store/ducks/products';
+import { Creators as CartActions } from '../../store/ducks/cart';
 import { makeStyles } from '@material-ui/core/styles';
 import { Delete, Add } from '@material-ui/icons';
 import {
@@ -67,29 +69,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Cart = () => {
+  const cart = useSelector((state) => state.cart);
+  const products = useSelector((state) => state.products);
+  console.log('CART:', cart);
+  console.log('PRODUCTS:', products);
+  const dispatch = useDispatch();
   const classes = useStyles();
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
   const [showToaster, setShowToaster] = useState(false);
-  const [showBlockUi, setShowBlockUi] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [productSelected, setProductSelected] = useState(null);
 
-  const getData = async () => {
-    const cartRes = await Axios.get('cart');
-    const itemIds = cartRes.data[0].items;
-    const productRes = await Axios.get(`products/${JSON.stringify(itemIds)}`);
-    setProducts(productRes.data);
-    setCart(itemIds);
+  const getInitialData = () => {
+    dispatch(ProductsActions.getProductsById(cart.products));
   };
 
   useEffect(() => {
-    setShowBlockUi(true);
-    getData().then(() => setShowBlockUi(false));
-  }, []);
+    getInitialData();
+    // eslint-disable-next-line
+  }, [cart]);
 
   const showTotalValue = () => {
-    const total = _.sum(products.map((p) => p.price.value));
+    const total = _.sum(products.products.map((p) => p.price.value));
     let priceShow = '';
     const priceStr = total.toString();
     if (priceStr.length > 3) {
@@ -105,12 +105,7 @@ const Cart = () => {
   };
 
   const removeFromCart = async (id) => {
-    setShowBlockUi(true);
-    const newCart = _.filter(cart, (item) => item !== id);
-    await Axios.post('cart', {
-      items: newCart,
-    });
-    await getData().then(() => setShowBlockUi(false));
+    dispatch(CartActions.removeProduct(id));
   };
 
   const handleClose = (event, reason) => {
@@ -152,7 +147,7 @@ const Cart = () => {
     <>
       <CssBaseline />
       <main>
-        <Backdrop className={classes.backdrop} open={showBlockUi}>
+        <Backdrop className={classes.backdrop} open={products.loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
         <Snackbar
@@ -194,8 +189,8 @@ const Cart = () => {
         )}
         <Container className={classes.cardGrid} maxWidth="lg">
           <List className={classes.root}>
-            {products.length ? (
-              products.map((product, index) => (
+            {products.products.length ? (
+              products.products.map((product, index) => (
                 <div key={index}>
                   <ListItem alignItems="flex-start">
                     <ListItemAvatar className={classes.marginAvatar}>
@@ -262,7 +257,7 @@ const Cart = () => {
             )}
             <ListItem>
               <ListItemText
-                primary={`Produtos no carrinho: ${products.length}`}
+                primary={`Produtos no carrinho: ${products.products.length}`}
               />
               <div className={classes.rightBox}>
                 {`VALOR TOTAL: `}
@@ -291,7 +286,7 @@ const Cart = () => {
               />
               <div className={classes.rightBox}>
                 <Button
-                  disabled={!cart.length}
+                  disabled={!products.products.length}
                   size="large"
                   variant="contained"
                   color="primary"
