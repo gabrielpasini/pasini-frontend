@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Axios from '../../config/config-axios';
 import { Creators as cartActions } from '../../store/ducks/cart';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -55,7 +54,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Products = () => {
   const cartState = useSelector((state) => state.cart);
-  const products = cartState.products;
+  // const products = cartState.products;
+  const products = [];
   console.log('VIEW_PRODUCTS: ', products);
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -68,6 +68,9 @@ const Products = () => {
     // const productRes = await Axios.get('products');
     // console.log(cartState);
     dispatch(cartActions.getCart());
+
+    // dispatch(productActions.getProducts());
+
     // console.log(cartState);
     // setProducts(productRes.data);
     // setCart(cartState);
@@ -106,6 +109,7 @@ const Products = () => {
 
   return (
     <>
+      <>{cartState.loading && 'carregando'}</>
       <CssBaseline />
       <main>
         <Backdrop className={classes.backdrop} open={showBlockUi}>

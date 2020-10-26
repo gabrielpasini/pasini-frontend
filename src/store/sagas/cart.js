@@ -1,5 +1,5 @@
 import { takeLatest, put, select, all, call } from 'redux-saga/effects';
-import { Types, Creators as CartActions } from '../ducks/cart';
+import { Types as CartTypes, Creators as CartActions } from '../ducks/cart';
 import Axios from '../../config/config-axios';
 
 function* getCart() {
@@ -22,10 +22,6 @@ function* updateRemoveCart(action) {
   console.log(response);
 }
 
-export default function* cartSaga() {
-  yield all([
-    takeLatest(Types.GET_CART, getCart),
-    takeLatest(Types.UPDATE_ADD_CART, updateAddCart),
-    takeLatest(Types.REMOVE_PRODUCT, updateRemoveCart),
-  ]);
+export default function* () {
+  yield all([takeLatest(CartTypes.GET_CART, getCart)]);
 }
