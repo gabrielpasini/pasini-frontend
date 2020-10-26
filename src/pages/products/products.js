@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Axios from '../../config/config-axios';
+import { Creators as cartActions } from '../../store/ducks/cart';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { ShoppingCart } from '@material-ui/icons';
@@ -52,40 +54,47 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Products = () => {
+  const cartState = useSelector((state) => state.cart);
+  const products = cartState.products;
+  console.log('VIEW_PRODUCTS: ', products);
+  const dispatch = useDispatch();
   const classes = useStyles();
   const history = useHistory();
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  // const [cart, setCart] = useState([]);
   const [showToaster, setShowToaster] = useState(false);
   const [showBlockUi, setShowBlockUi] = useState(false);
 
-  const getData = async () => {
-    const productRes = await Axios.get('products');
-    const cartRes = await Axios.get('cart');
-    setProducts(productRes.data);
-    setCart(cartRes.data[0].items);
+  const getInitialData = async () => {
+    // const productRes = await Axios.get('products');
+    // console.log(cartState);
+    dispatch(cartActions.getCart());
+    // console.log(cartState);
+    // setProducts(productRes.data);
+    // setCart(cartState);
   };
 
   useEffect(() => {
     setShowBlockUi(true);
-    getData().then(() => setShowBlockUi(false));
+    getInitialData().then(() => setShowBlockUi(false));
+    // eslint-disable-next-line
   }, []);
 
-  const updateCart = async (id) => {
-    setShowBlockUi(true);
-    let newCart = [];
-    const idExists = cart.find((i) => i === id);
-    if (idExists) {
-      setShowBlockUi(false);
-      setShowToaster(true);
-      return;
-    } else {
-      newCart = [...cart, id];
-    }
-    await Axios.post('cart', {
-      items: newCart,
-    }).then(() => setShowBlockUi(false));
-    history.push('/carrinho');
+  const addToCart = async (id) => {
+    // setShowBlockUi(true);
+    // let newCart = [];
+    // const idExists = cart.find((i) => i === id);
+    // if (idExists) {
+    //   setShowBlockUi(false);
+    //   setShowToaster(true);
+    //   return;
+    // } else {
+    //   newCart = [...cart, id];
+    //   dispatch(cartActions.addProduct(id));
+    // }
+    // await Axios.post('cart', {
+    //   items: newCart,
+    // }).then(() => setShowBlockUi(false));
+    //history.push('/carrinho');
   };
 
   const handleClose = (event, reason) => {
@@ -155,7 +164,7 @@ const Products = () => {
                         endIcon={<ShoppingCart />}
                         variant="contained"
                         color="secondary"
-                        onClick={() => updateCart(product._id)}
+                        onClick={() => addToCart(product._id)}
                       >
                         Adicionar ao carrinho
                       </Button>
@@ -166,7 +175,7 @@ const Products = () => {
                           size="small"
                           variant="contained"
                           color="secondary"
-                          onClick={() => updateCart(product._id)}
+                          onClick={() => addToCart(product._id)}
                         >
                           <ShoppingCart />
                         </Button>

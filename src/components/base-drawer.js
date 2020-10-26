@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import Axios from '../config/config-axios';
+import Routes from './routes';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import {
   Button,
@@ -27,7 +28,6 @@ import {
   Store,
   GitHub,
 } from '@material-ui/icons';
-import Routes from './routes';
 
 const drawerWidth = 240;
 
@@ -161,7 +161,6 @@ const BaseDrawer = () => {
               </Typography>
             </a>
           </Hidden>
-          {window.location.pathname !== '/carrinho' ? (
             <div className={classes.btnCart}>
               <Hidden xsDown>
                 <Button
@@ -193,9 +192,6 @@ const BaseDrawer = () => {
                 </Tooltip>
               </Hidden>
             </div>
-          ) : (
-            ''
-          )}
         </Toolbar>
       </AppBar>
       <Drawer
